@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADMIRIA 1.0 — Registration Data</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+–c1: #ff6b35;
+–c2: #f7c59f;
+–bg: #0d0d0d;
+–surface: #161616;
+–surface2: #1e1e1e;
+–border: rgba(255,107,53,0.2);
+–text: #f5f5f5;
+–muted: #777;
+–green: #1a936f;
+–red: #c0392b;
+}
+
+body {
+font-family: ‘Poppins’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+.bg-mesh {
+position: fixed; inset: 0; z-index: 0;
+background:
+radial-gradient(ellipse 70% 40% at 5% 0%, rgba(255,107,53,0.12) 0%, transparent 60%),
+radial-gradient(ellipse 50% 40% at 95% 100%, rgba(0,78,137,0.15) 0%, transparent 60%);
+}
+
+.page {
+position: relative; z-index: 1;
+max-width: 1000px;
+margin: 0 auto;
+padding: 40px 20px 80px;
+}
+
+/* HEADER */
+.top-header {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+margin-bottom: 36px;
+flex-wrap: wrap;
+gap: 20px;
+animation: fadeIn 0.8s ease both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+
+.brand { }
+.brand-name {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: clamp(2.5rem, 8vw, 4.5rem);
+line-height: 0.9;
+letter-spacing: 3px;
+background: linear-gradient(135deg, #ff6b35, #f7c59f, #ff6b35);
+background-size: 200% 200%;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+animation: shimmer 4s ease infinite;
+}
+@keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.brand-sub {
+font-size: 11px;
+font-weight: 600;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-top: 4px;
+}
+
+.header-actions {
+display: flex;
+gap: 10px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.btn {
+display: inline-flex;
+align-items: center;
+gap: 7px;
+padding: 11px 20px;
+border: none;
+border-radius: 10px;
+font-family: ‘Poppins’, sans-serif;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.25s;
+white-space: nowrap;
+letter-spacing: 0.3px;
+}
+.btn-excel {
+background: linear-gradient(135deg, #1a936f, #0f6b50);
+color: #fff;
+box-shadow: 0 6px 20px rgba(26,147,111,0.3);
+}
+.btn-clear {
+background: rgba(192,57,43,0.15);
+border: 1px solid rgba(192,57,43,0.3);
+color: #e74c3c;
+}
+.btn-refresh {
+background: rgba(255,107,53,0.12);
+border: 1px solid rgba(255,107,53,0.25);
+color: var(–c1);
+}
+.btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+/* STAT CARDS */
+.stats {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 14px;
+margin-bottom: 28px;
+animation: fadeIn 0.8s ease 0.1s both;
+}
+
+.stat {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 18px;
+padding: 20px 18px;
+position: relative;
+overflow: hidden;
+}
+.stat::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+background: var(–c1);
+opacity: 0.5;
+}
+.stat-num {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 2.6rem;
+color: var(–c1);
+line-height: 1;
+}
+.stat-label {
+font-size: 11px;
+color: var(–muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-top: 4px;
+}
+.stat-icon { font-size: 22px; position: absolute; top: 18px; right: 18px; opacity: 0.3; }
+
+/* TOOLBAR */
+.toolbar {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 16px;
+flex-wrap: wrap;
+}
+
+.search-wrap {
+position: relative;
+flex: 1;
+min-width: 200px;
+}
+.search-icon {
+position: absolute;
+left: 16px; top: 50%;
+transform: translateY(-50%);
+color: var(–muted);
+font-size: 14px;
+}
+.search-input {
+width: 100%;
+background: var(–surface);
+border: 1.5px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 12px 18px 12px 42px;
+color: var(–text);
+font-family: ‘Poppins’, sans-serif;
+font-size: 13px;
+outline: none;
+transition: all 0.25s;
+}
+.search-input:focus {
+border-color: var(–c1);
+box-shadow: 0 0 0 4px rgba(255,107,53,0.1);
+}
+.search-input::placeholder { color: var(–muted); }
+
+.filter-select {
+background: var(–surface);
+border: 1.5px solid rgba(255,255,255,0.08);
+border-radius: 12px;
+padding: 12px 16px;
+color: var(–text);
+font-family: ‘Poppins’, sans-serif;
+font-size: 13px;
+outline: none;
+cursor: pointer;
+transition: all 0.25s;
+-webkit-appearance: none;
+}
+.filter-select:focus { border-color: var(–c1); }
+.filter-select option { background: #1e1e1e; }
+
+.record-count {
+font-size: 12px;
+color: var(–muted);
+white-space: nowrap;
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.07);
+border-radius: 100px;
+padding: 6px 14px;
+}
+.record-count strong { color: var(–c1); }
+
+/* TABLE */
+.table-card {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 20px;
+overflow: hidden;
+box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+animation: fadeIn 0.8s ease 0.2s both;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+width: 100%;
+border-collapse: collapse;
+min-width: 640px;
+}
+
+thead tr {
+background: rgba(255,107,53,0.08);
+border-bottom: 1px solid var(–border);
+}
+
+th {
+padding: 14px 16px;
+text-align: left;
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–c2);
+white-space: nowrap;
+}
+
+td {
+padding: 14px 16px;
+font-size: 13px;
+border-bottom: 1px solid rgba(255,255,255,0.04);
+vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr {
+transition: background 0.15s;
+}
+tbody tr:hover td { background: rgba(255,107,53,0.04); }
+
+.std-badge {
+display: inline-block;
+background: rgba(255,107,53,0.12);
+border: 1px solid rgba(255,107,53,0.25);
+color: var(–c1);
+font-size: 11px;
+font-weight: 600;
+padding: 3px 10px;
+border-radius: 100px;
+}
+
+.num-col { color: var(–muted); font-size: 12px; }
+.time-col { color: var(–muted); font-size: 11px; white-space: nowrap; }
+
+.del-btn {
+background: rgba(192,57,43,0.12);
+border: 1px solid rgba(192,57,43,0.25);
+color: #e74c3c;
+border-radius: 8px;
+padding: 5px 12px;
+font-size: 12px;
+font-family: ‘Poppins’, sans-serif;
+cursor: pointer;
+transition: all 0.2s;
+}
+.del-btn:hover { background: rgba(192,57,43,0.25); }
+
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(–muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-text { font-size: 14px; line-height: 1.7; }
+
+/* Info box */
+.info-box {
+margin-top: 20px;
+background: rgba(255,107,53,0.06);
+border: 1px solid rgba(255,107,53,0.18);
+border-radius: 14px;
+padding: 16px 20px;
+font-size: 13px;
+color: var(–muted);
+line-height: 1.7;
+text-align: center;
+}
+.info-box strong { color: var(–c1); }
+
+@media(max-width:640px) {
+.stats { grid-template-columns: 1fr 1fr; }
+.top-header { flex-direction: column; }
+.header-actions { width: 100%; }
+.btn { flex: 1; justify-content: center; }
+}
+</style>
+
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<div class="page">
+
+  <!-- HEADER -->
+
+  <div class="top-header">
+    <div class="brand">
+      <div class="brand-name">ADMIRIA 1.0</div>
+      <div class="brand-sub">Registration Data Dashboard · Mother Care School</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-refresh" onclick="load()">↻ Refresh</button>
+      <button class="btn btn-clear" onclick="clearAll()">🗑 Clear All</button>
+      <button class="btn btn-excel" onclick="exportExcel()">📊 Export Excel</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-icon">👥</div>
+      <div class="stat-num" id="totalStat">0</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">📅</div>
+      <div class="stat-num" id="todayStat">0</div>
+      <div class="stat-label">Registered Today</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🏫</div>
+      <div class="stat-num" id="classStat">0</div>
+      <div class="stat-label">Classes Covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">📞</div>
+      <div class="stat-num" id="parentStat">0</div>
+      <div class="stat-label">With Parent Info</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="searchBox" placeholder="Search by name, contact, standard..." oninput="render()" />
+    </div>
+    <select class="filter-select" id="filterStd" onchange="render()">
+      <option value="">All Classes</option>
+      <option>Nursery</option>
+      <option>Jr. KG</option><option>Sr. KG</option>
+      <option>1st Std</option><option>2nd Std</option><option>3rd Std</option>
+      <option>4th Std</option><option>5th Std</option><option>6th Std</option>
+      <option>7th Std</option><option>8th Std</option><option>9th Std</option>
+      <option>10th Std</option><option>11th Std</option><option>12th Std</option>
+    </select>
+    <div class="record-count" id="countLabel"><strong>0</strong> records</div>
+  </div>
+
+  <!-- TABLE -->
+
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student Name</th>
+            <th>Standard</th>
+            <th>Division</th>
+            <th>Contact</th>
+            <th>Parent's Name</th>
+            <th>Registered At</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="info-box">
+    ⚠️ This page reads data saved by the <strong>registration form</strong>.
+    Both files must be opened in the <strong>same browser on the same device</strong>.
+    Data auto-refreshes every 15 seconds. Click <strong>Export Excel</strong> to download as .xlsx
+  </div>
+
+</div>
+
+<script>
+let data = [];
+
+function load() {
+  data = JSON.parse(localStorage.getItem('admiria_v2') || '[]');
+  updateStats();
+  render();
+}
+
+function updateStats() {
+  document.getElementById('totalStat').textContent = data.length;
+
+  const today = new Date().toLocaleDateString('en-IN');
+  document.getElementById('todayStat').textContent =
+    data.filter(r => r.time && r.time.startsWith(today)).length;
+
+  document.getElementById('classStat').textContent =
+    new Set(data.map(r => r.std)).size;
+
+  document.getElementById('parentStat').textContent =
+    data.filter(r => r.parent && r.parent !== '-').length;
+}
+
+function render() {
+  const q     = document.getElementById('searchBox').value.toLowerCase();
+  const fStd  = document.getElementById('filterStd').value;
+
+  const filtered = data.filter(r => {
+    const matchQ = !q ||
+      r.name.toLowerCase().includes(q) ||
+      r.contact.includes(q) ||
+      r.std.toLowerCase().includes(q) ||
+      (r.parent && r.parent.toLowerCase().includes(q));
+    const matchStd = !fStd || r.std === fStd;
+    return matchQ && matchStd;
+  });
+
+  document.getElementById('countLabel').innerHTML = `<strong>${filtered.length}</strong> records`;
+
+  const tbody = document.getElementById('tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8">
+      <div class="empty-state">
+        <div class="empty-icon">${data.length === 0 ? '📋' : '🔍'}</div>
+        <div class="empty-text">
+          ${data.length === 0
+            ? 'No registrations yet.<br>Open the Registration Form to start collecting data.'
+            : 'No records match your search.'}
+        </div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => `
+    <tr>
+      <td class="num-col">${i + 1}</td>
+      <td><strong>${r.name}</strong></td>
+      <td><span class="std-badge">${r.std}</span></td>
+      <td style="color:var(--muted)">${r.division}</td>
+      <td style="font-family:monospace;font-size:13px">${r.contact}</td>
+      <td>${r.parent}</td>
+      <td class="time-col">${r.time}</td>
+      <td><button class="del-btn" onclick="del('${r.id}')">✕ Remove</button></td>
+    </tr>
+  `).join('');
+}
+
+function del(id) {
+  if (!confirm('Remove this registration?')) return;
+  data = data.filter(r => String(r.id) !== String(id));
+  localStorage.setItem('admiria_v2', JSON.stringify(data));
+  updateStats(); render();
+}
+
+function clearAll() {
+  if (data.length === 0) { alert('No data to clear.'); return; }
+  if (!confirm(`⚠️ Delete ALL ${data.length} registrations permanently? This cannot be undone.`)) return;
+  data = [];
+  localStorage.setItem('admiria_v2', JSON.stringify([]));
+  updateStats(); render();
+}
+
+function exportExcel() {
+  if (data.length === 0) { alert('No registrations to export yet!'); return; }
+
+  const rows = data.map((r, i) => ({
+    'Sr No'          : i + 1,
+    'Student Name'   : r.name,
+    'Standard'       : r.std,
+    'Division'       : r.division,
+    'Contact Number' : r.contact,
+    "Parent's Name"  : r.parent,
+    'Registration Time': r.time
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [
+    {wch:6},{wch:26},{wch:12},{wch:10},{wch:18},{wch:24},{wch:22}
+  ];
+
+  // Style header row
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) {
+      cell.s = {
+        fill: { fgColor: { rgb: 'FF6B35' } },
+        font: { bold: true, color: { rgb: 'FFFFFF' } }
+      };
+    }
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'ADMIRIA 1.0');
+  XLSX.writeFile(wb, `ADMIRIA_1.0_Registrations_${new Date().toLocaleDateString('en-GB').replace(/\//g,'-')}.xlsx`);
+}
+
+load();
+setInterval(load, 15000); // Auto refresh every 15s
+</script>
+
+</body>
+</html>
